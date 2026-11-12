@@ -12,12 +12,12 @@
       sources = {
         x86_64-linux = {
           arch = "x86_64";
-          hash = "e272e3970b09085638a9b56f08b8bb1fbe6d97146e83ffced6299270259ddcf9";
+          hash = "sha256-yH6E3fK0IZ6lUBUO5SbNBzgKQreLVaeBRGyCA+FLClA=";
         };
         aarch64-linux = {
           arch = "arm64";
-          # Run: nix store prefetch-file https://github.com/pol-rivero/github-desktop-plus/releases/download/v3.6.11.0/GitHubDesktopPlus-v3.6.11.0-linux-arm64.deb
-          hash = "db10da6dfe97761dd0e3eb38182dc3ff704bf4e98fd8392558ce59a56f6aa8ca";
+          # Run: nix store prefetch-file https://github.com/pol-rivero/github-desktop-plus/releases/download/v3.6.11.0/DesktopPlus-v3.6.11.0-linux-arm64.deb
+          hash = "sha256-2xDabf6Xdh3Q4+s4GC3D/3BL9OmP2DklWM5ZpW9qqMo=";
         };
       };
 
@@ -80,7 +80,7 @@
             inherit version;
 
             src = pkgs.fetchurl {
-              url = "https://github.com/pol-rivero/github-desktop-plus/releases/download/v${version}/GitHubDesktopPlus-v${version}-linux-${srcInfo.arch}.deb";
+              url = "https://github.com/pol-rivero/github-desktop-plus/releases/download/v${version}/DesktopPlus-v${version}-linux-${srcInfo.arch}.deb";
               sha256 = srcInfo.hash;
             };
 
@@ -114,19 +114,18 @@
               mkdir -p $out/bin
               cp -r usr/share $out/share
               cp -r usr/lib $out/lib
-
               # Replace bundled git with NixOS system git
-              rm -rf $out/lib/github-desktop-plus/resources/app/git
-              ln -s ${pkgs.git} $out/lib/github-desktop-plus/resources/app/git
+              rm -rf $out/lib/desktop-plus/resources/app/git
+              ln -s ${pkgs.git} $out/lib/desktop-plus/resources/app/git
 
               # Fix .desktop Exec path if present
-              if [ -f $out/share/applications/github-desktop-plus.desktop ]; then
-                substituteInPlace $out/share/applications/github-desktop-plus.desktop \
-                  --replace-quiet "/usr/bin/github-desktop-plus" "$out/bin/github-desktop-plus" \
-                  --replace-quiet "/usr/lib/github-desktop-plus/github-desktop-plus" "$out/bin/github-desktop-plus"
+              if [ -f $out/share/applications/desktop-plus.desktop ]; then
+                substituteInPlace $out/share/applications/desktop-plus.desktop \
+                  --replace-quiet "/usr/bin/desktop-plus" "$out/bin/desktop-plus" \
+                  --replace-quiet "/usr/lib/plus/desktop-plus" "$out/bin/desktop-plus"
               fi
 
-              makeWrapper $out/lib/github-desktop-plus/github-desktop-plus $out/bin/github-desktop-plus \
+              makeWrapper $out/lib/desktop-plus/desktop-plus $out/bin/desktop-plus \
                 --prefix LD_LIBRARY_PATH : "${pkgs.lib.makeLibraryPath runtimeLibs}" \
                 --add-flags "--no-sandbox --enable-features=UseOzonePlatform --ozone-platform-hint=auto"
 
@@ -151,7 +150,7 @@
       apps = forAllSystems (system: {
         default = {
           type = "app";
-          program = "${self.packages.${system}.default}/bin/github-desktop-plus";
+          program = "${self.packages.${system}.default}/bin/desktop-plus";
         };
       });
 
